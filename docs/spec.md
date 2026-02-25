@@ -84,7 +84,7 @@ MCP Gateway (localhost:8080)
 
 AWS Cognito (Authorization Server)
    ├── User Pool with single user (Evie)
-   ├── Custom domain: auth.evehuang.com
+   ├── Custom domain: auth.evehwang.com
    ├── Pre-registered App Client (for claude.ai)
    ├── Hosted UI for one-time authentication
    ├── Issues JWTs validated by gateway
@@ -146,13 +146,13 @@ This is the proper implementation of what was originally specced but fell back t
 - **Redirect URIs:** `https://claude.ai/api/mcp/auth_callback` AND `https://claude.com/api/mcp/auth_callback` (allowlist both)
 - **Token settings:** Access token expiry ~1 hour, refresh token expiry ~30 days
 - **Scopes:** `openid`, `email`
-- **Custom domain:** `auth.evehuang.com` (requires ACM certificate in us-east-1)
+- **Custom domain:** `auth.evehwang.com` (requires ACM certificate in us-east-1)
 
 ### Cognito Custom Domain Setup
 
 1. ACM certificate in **us-east-1** (N. Virginia) — mandatory regardless of User Pool region
-1. Route 53 A record (alias) for `auth.evehuang.com` pointing to the CloudFront distribution Cognito creates
-1. A parent A record for `evehuang.com` must exist in Route 53
+1. Route 53 A record (alias) for `auth.evehwang.com` pointing to the CloudFront distribution Cognito creates
+1. A parent A record for `evehwang.com` must exist in Route 53
 1. Propagation: Custom domain takes ~5 minutes, CloudFront distribution up to 1 hour
 
 ### Gateway Auth Implementation
@@ -169,7 +169,7 @@ The gateway must:
 1. Settings → Connectors → Remove existing Fastmail and Music connectors
 1. Add custom connector with the gateway's Tailscale Funnel URL
 1. Advanced Settings → enter pre-registered Client ID and Client Secret from Cognito
-1. Complete OAuth flow (one-time Cognito login at auth.evehuang.com)
+1. Complete OAuth flow (one-time Cognito login at auth.evehwang.com)
 
 ### Fallback: Password-Gate
 
@@ -206,7 +206,7 @@ If OAuth still doesn't work in claude.ai (the pre-registration flow fails or tok
 1. Create Cognito User Pool via AWS CLI or Console
 1. Create single user (Evie)
 1. Create App Client with pre-registered Client ID and Secret
-1. Set up custom domain (auth.evehuang.com) with ACM certificate
+1. Set up custom domain (auth.evehwang.com) with ACM certificate
 1. Configure redirect URIs for claude.ai
 
 ### Phase 5: Gateway Auth Integration

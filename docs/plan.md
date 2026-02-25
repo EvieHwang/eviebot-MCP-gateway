@@ -193,7 +193,7 @@ aws cognito-idp describe-user-pool-client \
 
 ```bash
 aws cognito-idp describe-user-pool-domain \
-  --domain auth.evehuang.com \
+  --domain auth.evehwang.com \
   --region us-east-1
 ```
 
@@ -201,7 +201,7 @@ If custom domain exists and is active, Phase 4 may already be complete. If not:
 
 ### 4.3 Create Custom Domain (if needed)
 
-1. Request ACM certificate for auth.evehuang.com in us-east-1
+1. Request ACM certificate for auth.evehwang.com in us-east-1
 2. **Human task:** Verify ACM certificate (GitHub issue #1)
 3. Create custom domain on Cognito User Pool
 4. Create Route 53 A record alias to CloudFront distribution

@@ -13,7 +13,7 @@ MCP Gateway for Eviebot — a single HTTPS endpoint that aggregates multiple MCP
 ## Stack
 
 - **Gateway:** FastMCP 3.0.2 proxy mode (`create_proxy` + `mount` with namespaces)
-- **Auth:** AWS Cognito (OAuth 2.1, User Pool `us-east-1_4Y1JyaYkC`, custom domain auth.evehuang.com)
+- **Auth:** AWS Cognito (OAuth 2.1, User Pool `us-east-1_4Y1JyaYkC`, custom domain auth.evehwang.com)
 - **Networking:** Tailscale Funnel (port 443 → gateway on localhost:8080)
 - **Backend servers:** FastMCP (Python) + MCP SDK (Node.js/TypeScript)
 - **Service management:** launchd (macOS)
@@ -35,7 +35,7 @@ MCP servers bind to localhost only and are never directly internet-accessible.
 - Code: `gateway.py` + `auth.py`
 - Local port: 8080
 - Exposed via: Tailscale Funnel (https://eviebot.tailf90db7.ts.net)
-- Auth: OAuth 2.1 via AWS Cognito (auth.evehuang.com)
+- Auth: OAuth 2.1 via AWS Cognito (auth.evehwang.com)
 - LaunchAgent: `com.evie.mcp-gateway`
 - Logs: `~/Library/Logs/mcp-gateway/`
 
