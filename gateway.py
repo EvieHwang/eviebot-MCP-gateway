@@ -10,6 +10,7 @@ shared secret, so the gateway mints a service token for it.
 """
 
 import os
+import time
 
 import jwt
 from fastmcp import FastMCP
@@ -38,18 +39,26 @@ music_jwt_secret = os.environ.get("MUSIC_JWT_SECRET", "")
 music_server_url = "https://eviebot.tailf90db7.ts.net"
 
 if music_jwt_secret:
-    music_token = jwt.encode(
-        {"sub": "gateway", "scopes": ["mcp:tools"], "aud": music_server_url},
-        music_jwt_secret,
-        algorithm="HS256",
-    )
-    # Create a client factory that makes a new ProxyClient each time,
-    # using a transport with the service token as a static Bearer token.
-    # The `auth` parameter takes precedence over forwarded headers.
-    def _music_client_factory(token=music_token):
+    def _mint_music_token(secret=music_jwt_secret, url=music_server_url):
+        """Mint a short-lived JWT the Music server will accept."""
+        return jwt.encode(
+            {
+                "sub": "gateway",
+                "scopes": ["mcp:tools"],
+                "aud": url,
+                "iat": int(time.time()),
+                "exp": int(time.time()) + 3600,  # 1 hour
+            },
+            secret,
+            algorithm="HS256",
+        )
+
+    # Create a client factory that mints a fresh token each time,
+    # so expiry is never an issue across long-running gateway sessions.
+    def _music_client_factory():
         transport = StreamableHttpTransport(
             "http://localhost:3000/mcp",
-            auth=token,
+            auth=_mint_music_token(),
         )
         return ProxyClient(transport)
 
