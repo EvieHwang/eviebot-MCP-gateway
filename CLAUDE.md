@@ -12,10 +12,10 @@ MCP Gateway for Eviebot — a single HTTPS endpoint that aggregates multiple MCP
 
 ## Stack
 
-- **Gateway:** [TBD — decided after Phase 1 discovery: mcp-proxy, FastMCP proxy, or mcp-front]
-- **Auth:** AWS Cognito (OAuth 2.1, custom domain auth.evehuang.com)
+- **Gateway:** [TBD — see evaluation in docs/plan.md Phase 1.7]
+- **Auth:** AWS Cognito (OAuth 2.1, User Pool `us-east-1_4Y1JyaYkC`, custom domain auth.evehuang.com)
 - **Networking:** Tailscale Funnel (port 443 → gateway on localhost:8080)
-- **Backend servers:** Existing FastMCP (Python) servers, unchanged
+- **Backend servers:** FastMCP (Python) + MCP SDK (Node.js/TypeScript)
 - **Service management:** launchd (macOS)
 
 ## MCP Gateway Architecture
@@ -26,8 +26,8 @@ MCP servers bind to localhost only and are never directly internet-accessible.
 
 ### Gateway
 
-- Location: [TBD — post-discovery]
-- Config: [TBD — post-discovery]
+- Location: [TBD — post Phase 2]
+- Config: [TBD — post Phase 2]
 - Local port: 8080
 - Exposed via: Tailscale Funnel (https://eviebot.tailf90db7.ts.net)
 - Auth: OAuth 2.1 via AWS Cognito (auth.evehuang.com)
@@ -35,14 +35,35 @@ MCP servers bind to localhost only and are never directly internet-accessible.
 
 ### Registered MCP Servers
 
-| Name | Port | Repo | Description |
-|------|------|------|-------------|
-| fastmail | [TBD] | [TBD] | Email read/search via JMAP |
-| music | [TBD] | [TBD] | Apple Music playlists and discovery |
+| Name | Port | Repo | Framework | Transport | LaunchAgent |
+|------|------|------|-----------|-----------|-------------|
+| fastmail | 8000 | ~/projects/fastmail-mcp-server | FastMCP 3.0.2 (Python) | Streamable HTTP (`/mcp`) | com.evie.fastmail-mcp |
+| music | 3000 | ~/projects/mood-playlist-mcp | @modelcontextprotocol/sdk 1.27 (Node/TS) | Streamable HTTP (`/mcp`) | com.mood-playlist-mcp |
+
+### Current Tailscale Funnel Config
+
+```
+https://eviebot.tailf90db7.ts.net     → http://127.0.0.1:8000 (Fastmail)
+https://eviebot.tailf90db7.ts.net:8443 → http://127.0.0.1:3000 (Music)
+```
+
+The gateway will consolidate both into a single port 443 → localhost:8080.
+
+### Existing Auth
+
+Both servers already implement full OAuth 2.1 with Cognito:
+- Fastmail: Custom `CognitoAuthProvider` in `auth.py`, validates JWTs via JWKS
+- Music: `MoodPlaylistOAuthProvider` in `src/auth/oauth-provider.ts`
+- Cognito User Pool: `us-east-1_4Y1JyaYkC`
+- Public Client ID: `2m0mavh487mal44dgrd9vkr07a`
+
+The gateway must either:
+1. Reuse the same Cognito setup (validate tokens at gateway, pass through to backends)
+2. Or bypass backend auth entirely since backends will be localhost-only
 
 ### Adding a New MCP Server
 
-1. Build the server to bind to localhost on port [next available]
+1. Build the server to bind to localhost on the next available port
 2. Do NOT implement authentication — the gateway handles this
 3. Add entry to gateway config: [TBD — path to config file]
 4. Create launchd plist in ~/Library/LaunchAgents/
@@ -51,9 +72,9 @@ MCP servers bind to localhost only and are never directly internet-accessible.
 
 ### Port Allocation
 
-- 8080: MCP Gateway
-- [TBD]: Fastmail MCP server (existing)
-- [TBD]: Music MCP server (existing)
+- 8080: MCP Gateway (planned)
+- 8000: Fastmail MCP server (existing, localhost only)
+- 3000: Music MCP server (existing, `*:3000`)
 - 3001+: Future MCP servers (assign sequentially)
 
 ### Tool Naming Convention
@@ -67,4 +88,5 @@ automatically (e.g., a tool named `search_emails` on the `fastmail` server becom
 
 - Discovery and build happen on Eviebot (Mac mini, headless)
 - The two existing MCP servers must NOT be modified
-- Password-gate on existing servers stays as defense-in-depth
+- Both servers already have Cognito OAuth — the gateway can reuse this infrastructure
+- Fastmail binds to localhost:8000; Music binds to *:3000 (both behind Funnel currently)
