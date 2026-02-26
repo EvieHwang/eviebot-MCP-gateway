@@ -2,6 +2,12 @@
 
 A single MCP gateway that aggregates multiple [Model Context Protocol](https://modelcontextprotocol.io/) servers behind one authenticated HTTPS endpoint. Connect Claude.ai (or any MCP client) to one URL and get access to all your tools.
 
+## Why a gateway?
+
+MCP servers running on a home machine or small server typically have access to a single public HTTPS port. Tailscale Funnel, for example, exposes one hostname on port 443. A single MCP server works fine, but multiple servers require a routing layer — each Claude.ai connector expects its own URL.
+
+Possible solutions include path-based routing at the tunnel layer (not yet supported by Tailscale Funnel), native multi-server support in MCP clients, or a VPS with a traditional reverse proxy. This gateway takes a different approach: it binds to that single HTTPS port, connects to all backend MCP servers over localhost, and presents a unified tool catalog with automatic namespace prefixing. Adding a server requires a config change and a gateway restart — no client-side changes.
+
 Built with [FastMCP](https://github.com/jlowin/fastmcp) proxy mode, authenticated via AWS Cognito (OAuth 2.1), and exposed to the internet through [Tailscale Funnel](https://tailscale.com/kb/1223/funnel).
 
 ## Architecture
