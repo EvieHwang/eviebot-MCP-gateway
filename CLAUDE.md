@@ -58,10 +58,12 @@ https://eviebot.tailf90db7.ts.net → http://127.0.0.1:8080 (Gateway)
 |------|------|------|-----------|-----------|-------------|
 | fastmail | 8000 | ~/projects/fastmail-mcp-server | FastMCP 3.0.2 (Python) | Streamable HTTP (`/mcp`) | com.evie.fastmail-mcp |
 | music | 3000 | ~/projects/mood-playlist-mcp | @modelcontextprotocol/sdk 1.27 (Node/TS) | Streamable HTTP (`/mcp`) | com.mood-playlist-mcp |
+| obsidian | 3001 | ~/projects/eviebot-mcp-obsidian | FastMCP 3.0.2 (Python) | Streamable HTTP (`/mcp`) | com.evie.obsidian-mcp |
+| github | 3002 | ~/projects/eviebot-mcp-github | FastMCP 3.0.2 (Python) | Streamable HTTP (`/mcp`) | com.evie.github-mcp |
 
 ### Adding a New MCP Server
 
-1. Build the server to bind to localhost on the next available port (3001+)
+1. Build the server to bind to localhost on the next available port (3003+)
 2. Do NOT implement authentication — the gateway handles this
 3. Add a `create_proxy` + `gateway.mount()` call in `gateway.py`
 4. Create launchd plist in ~/Library/LaunchAgents/
@@ -73,7 +75,9 @@ https://eviebot.tailf90db7.ts.net → http://127.0.0.1:8080 (Gateway)
 - 8080: MCP Gateway
 - 8000: Fastmail MCP server (existing, localhost only)
 - 3000: Music MCP server (existing)
-- 3001+: Future MCP servers (assign sequentially)
+- 3001: Obsidian MCP server
+- 3002: GitHub MCP server
+- 3003+: Future MCP servers (assign sequentially)
 
 ### Tool Naming Convention
 
@@ -84,6 +88,7 @@ automatically (e.g., a tool named `search_emails` on the `fastmail` server becom
 
 ## Development Notes
 
-- The two existing MCP servers must NOT be modified
-- Both servers already have Cognito OAuth — gateway passes through Bearer tokens
+- Existing MCP servers (fastmail, music) must NOT be modified
+- Fastmail and music servers have Cognito OAuth — gateway passes through Bearer tokens
+- Obsidian server has no auth — localhost only, gateway handles auth
 - Cognito User Pool: `us-east-1_4Y1JyaYkC`, Public Client ID: `2m0mavh487mal44dgrd9vkr07a`
