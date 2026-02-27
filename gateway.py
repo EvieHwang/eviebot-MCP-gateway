@@ -69,6 +69,16 @@ else:
     music = create_proxy("http://localhost:3000/mcp")
     gateway.mount(music, namespace="music")
 
+# --- Filesystem backend ---
+# No auth needed — gateway forwards Cognito token (backend ignores it).
+filesystem = create_proxy("http://localhost:3001/mcp")
+gateway.mount(filesystem, namespace="filesystem")
+
+# --- GitHub backend ---
+# Same pass-through pattern as Filesystem.
+github = create_proxy("http://localhost:3002/mcp")
+gateway.mount(github, namespace="github")
+
 if __name__ == "__main__":
     gateway.run(
         transport="streamable-http",
