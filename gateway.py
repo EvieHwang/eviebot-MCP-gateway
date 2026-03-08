@@ -78,6 +78,11 @@ gateway.mount(obsidian, namespace="obsidian")
 github = create_proxy("http://localhost:3002/mcp")
 gateway.mount(github, namespace="github")
 
+# --- Policy backend ---
+# Persistent policy reasoning — philosophy + positions. No auth needed.
+policy = create_proxy("http://localhost:3003/mcp")
+gateway.mount(policy, namespace="policy")
+
 if __name__ == "__main__":
     gateway.run(
         transport="streamable-http",
